@@ -21,7 +21,7 @@ class FakeAccommodationRepository : AccommodationRepository {
             val distance = random.nextDouble(100.0, 2500.0)
             Accommodation(
                 id = "acc-$index",
-                name = "${randomCityName(random)} 힐링 스테이 $index호",
+                name = "${randomCityName(random)} 힐링 스테이 ${index}호",
                 address = "${randomCityName(random)} ${index * 3}길",
                 distanceMeters = distance,
                 pricePerNight = random.nextInt(60000, 240000),
