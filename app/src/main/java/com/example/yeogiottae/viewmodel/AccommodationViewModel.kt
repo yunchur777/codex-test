@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yeogiottae.data.Accommodation
 import com.example.yeogiottae.domain.GetNearbyAccommodationsUseCase
+import com.example.yeogiottae.location.LocationCoordinate
 import com.example.yeogiottae.location.LocationProvider
 import com.example.yeogiottae.location.LocationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,8 +50,9 @@ class AccommodationViewModel @Inject constructor(
         }
     }
 
-    private fun loadAccommodations(coordinate: com.example.yeogiottae.location.LocationCoordinate) {
+    private fun loadAccommodations(coordinate: LocationCoordinate) {
         viewModelScope.launch {
+            _state.update { it.copy(currentLocation = coordinate) }
             getNearbyAccommodations(coordinate).collect { accommodations ->
                 _state.update {
                     it.copy(
@@ -82,6 +84,7 @@ data class AccommodationUiState(
     val isLoading: Boolean = false,
     val isBooking: Boolean = false,
     val accommodations: List<Accommodation> = emptyList(),
+    val currentLocation: LocationCoordinate? = null,
     val errorMessage: String? = null,
     val lastBooked: Accommodation? = null
 )
