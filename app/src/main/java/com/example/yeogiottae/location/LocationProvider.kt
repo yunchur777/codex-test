@@ -1,7 +1,10 @@
 package com.example.yeogiottae.location
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +29,22 @@ class FusedLocationProvider(private val context: Context) : LocationProvider {
 
     @SuppressLint("MissingPermission")
     override fun observeLocation(): Flow<LocationResult> = callbackFlow {
+        val hasFinePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        val hasCoarsePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!hasFinePermission && !hasCoarsePermission) {
+            trySend(LocationResult.PermissionDenied)
+            close()
+            awaitClose {}
+            return@callbackFlow
+        }
+
         val client = LocationServices.getFusedLocationProviderClient(context)
         val locationTask = client.lastLocation
         locationTask.addOnSuccessListener { location ->
